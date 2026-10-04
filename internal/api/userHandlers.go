@@ -1,8 +1,17 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/JoaoVitorResende/GoBid/internal/jsonutils"
+	"github.com/JoaoVitorResende/GoBid/internal/usecase/user"
+)
 
 func (api *Api) handleSignupUser(w http.ResponseWriter, r *http.Request) {
+	data, problems, err := jsonutils.DecodeValidJson[user.CreateUserReq](r)
+	if err != nil{
+		_ = jsonutils.EncodeJson(w,r, http.StatusUnprocessableEntity, problems)
+	}
 	panic("Todo handle signup")
 }
 
