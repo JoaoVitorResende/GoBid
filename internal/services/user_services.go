@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
-
+//pool serve para manter o banco de dados aberto igual ao ado.net
 type UserService struct {
 	pool    *pgxpool.Pool
 	queries *pgstore.Queries
