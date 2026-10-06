@@ -14,3 +14,15 @@ SELECT
     update_at
 FROM users
 WHERE id = $1;
+
+-- name: GetUserByEmail :one
+SELECT
+    id,
+    user_name,
+    password_hash,
+    email,
+    bio,
+    create_at,
+    update_at
+FROM users
+WHERE email = $1;

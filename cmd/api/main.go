@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/JoaoVitorResende/GoBid/internal/api"
 	"github.com/JoaoVitorResende/GoBid/internal/services"
+	"github.com/alexedwards/scs/pgxstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -47,15 +50,22 @@ func main() {
 		panic(err)
 	}
 
+	s := scs.New()
+	s.Store = pgxstore.New(pool)
+	s.Lifetime = 24 * time.Hour
+	s.Cookie.HttpOnly = true
+	s.Cookie.SameSite = http.SameSiteLaxMode
+	
 	api := api.Api{
-		Router: chi.NewMux(),
+		Router:      chi.NewMux(),
 		UserService: services.NewUserService(pool),
+		Sessions:    s,
 	}
 
 	api.BindRoutes()
 
 	fmt.Println("starting server on pont :3080")
-	if err := http.ListenAndServe("localhost:3080", api.Router); err != nil{
+	if err := http.ListenAndServe("localhost:3080", api.Router); err != nil {
 		panic(err)
 	}
 }

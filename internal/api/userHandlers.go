@@ -23,7 +23,7 @@ func (api *Api) handleSignupUser(w http.ResponseWriter, r *http.Request) {
 		data.Bio)
 
 	if err != nil {
-		if errors.Is(err, services.ErrDuplicatedEmailOrPassword) {
+		if errors.Is(err, services.ErrDuplicatedEmailOrUserName) {
 			_ = jsonutils.EncodeJson(w, r, http.StatusUnprocessableEntity, map[string]any{
 				"error": "email or username already exists",
 			})
@@ -37,7 +37,22 @@ func (api *Api) handleSignupUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *Api) handleLoginUser(w http.ResponseWriter, r *http.Request) {
-	panic("Todo handle login")
+	data, problems, err := jsonutils.DecodeValidJson[user.LoginUserReq](r)
+	if err != nil {
+		jsonutils.EncodeJson(w, r, http.StatusUnprocessableEntity, problems)
+	}
+
+	id, err := api.UserService.AuthenticateUser(r.Context(), data.Email, data.Password)
+
+	if err != nil{
+		if errors.Is(err, services.ErrInvalidCredentials){
+			jsonutils.EncodeJson(w, r, http.StatusBadRequest, map[string]any{
+				"error": "unexpected internal server error",
+			})
+			return
+		}
+	}
+	err :=api.Sessions.RenewToken(r.Context())
 }
 
 func (api *Api) handleLogOutUser(w http.ResponseWriter, r *http.Request) {
