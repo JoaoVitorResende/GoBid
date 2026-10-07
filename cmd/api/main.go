@@ -18,7 +18,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// go build -o ./bin/api.exe ./cmd/api
+// go build -o ./bin/api.exe ./cmd/api to create the exe
 // .\bin\api.exe
 func main() {
 
